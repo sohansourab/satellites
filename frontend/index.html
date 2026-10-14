@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OrbitDesk — Space Mission Control</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-orbit" aria-hidden="true">◍</span>
+      <h1>OrbitDesk</h1>
+      <span class="tagline">space mission control dashboard</span>
+    </div>
+    <div class="status-chips" role="status" aria-live="polite">
+      <span id="chip-source" class="chip hidden"></span>
+      <span id="chip-updated" class="chip hidden"></span>
+      <span id="chip-ai" class="chip chip-ai"></span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- Left: satellite list -->
+    <section class="panel panel-list" aria-label="Satellite list">
+      <div class="panel-head">
+        <h2>Satellites</h2>
+        <button id="btn-refresh" class="btn btn-icon" title="Refresh data from CelesTrak" aria-label="Refresh data">⟳</button>
+      </div>
+      <form id="search-form" class="search-row" role="search">
+        <input id="search-input" type="search" placeholder="Search by name or NORAD ID…"
+               aria-label="Search satellites" autocomplete="off" />
+      </form>
+      <label class="group-row">
+        <span>Group:</span>
+        <select id="group-select" aria-label="Satellite group"></select>
+      </label>
+      <p id="notice" class="notice hidden" role="alert"></p>
+      <ul id="sat-list" class="sat-list" aria-label="Satellite results"></ul>
+      <div id="list-loading" class="state-box hidden"><div class="spinner"></div><p>Loading satellites…</p></div>
+      <div id="list-error" class="state-box state-error hidden"><p>⚠ <span id="list-error-msg"></span></p></div>
+      <div id="list-empty" class="state-box hidden"><p>No satellites match your search.</p></div>
+      <footer class="panel-foot"><span id="list-count"></span></footer>
+    </section>
+
+    <!-- Center: map -->
+    <section class="panel panel-map" aria-label="Orbital map">
+      <div id="map" role="application" aria-label="World map with satellite positions"></div>
+      <div class="map-overlay map-caption">
+        <strong id="map-sat-name">Select a satellite</strong>
+        <span id="map-sat-meta">Markers show SGP4-calculated positions from cached TLE data — not live observations.</span>
+      </div>
+      <div class="map-overlay map-time hidden" id="map-time">
+        Calculated at <time id="map-computed-at"></time> · TLE epoch <time id="map-tle-epoch"></time>
+      </div>
+    </section>
+
+    <!-- Right: details + assistant -->
+    <section class="panel panel-side" aria-label="Details and assistant">
+      <div class="tabs" role="tablist">
+        <button class="tab active" role="tab" aria-selected="true" data-tab="details" id="tab-details-btn">Details</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="assistant" id="tab-assistant-btn">Assistant</button>
+      </div>
+
+      <div id="tab-details" class="tab-body" role="tabpanel">
+        <div id="details-placeholder" class="state-box">
+          <p>🛰 Pick a satellite from the list or map to inspect its orbit.</p>
+        </div>
+        <div id="details-body" class="hidden">
+          <h3 id="det-name"></h3>
+          <dl class="detail-grid">
+            <div><dt>NORAD ID</dt><dd id="det-norad"></dd></div>
+            <div><dt>Intl. designator</dt><dd id="det-objid"></dd></div>
+            <div><dt>Group</dt><dd id="det-group"></dd></div>
+            <div><dt>Data source</dt><dd id="det-source"></dd></div>
+            <div><dt>Data fetched</dt><dd id="det-fetched"></dd></div>
+            <div><dt>TLE epoch</dt><dd id="det-epoch"></dd></div>
+            <div><dt>Inclination</dt><dd id="det-inc"></dd></div>
+            <div><dt>RAAN</dt><dd id="det-raan"></dd></div>
+            <div><dt>Eccentricity</dt><dd id="det-ecc"></dd></div>
+            <div><dt>Arg. of perigee</dt><dd id="det-aop"></dd></div>
+            <div><dt>Mean motion</dt><dd id="det-mm"></dd></div>
+            <div><dt>Period</dt><dd id="det-period"></dd></div>
+            <div><dt>Apogee</dt><dd id="det-apo"></dd></div>
+            <div><dt>Perigee</dt><dd id="det-peri"></dd></div>
+            <div><dt>Latitude (calc)</dt><dd id="det-lat"></dd></div>
+            <div><dt>Longitude (calc)</dt><dd id="det-lon"></dd></div>
+            <div><dt>Altitude (calc)</dt><dd id="det-alt"></dd></div>
+            <div><dt>Velocity (calc)</dt><dd id="det-vel"></dd></div>
+          </dl>
+          <label class="pos-time-row">
+            <span>Position time (UTC):</span>
+            <input type="datetime-local" id="pos-time" step="1" />
+            <button id="btn-pos-now" class="btn btn-small">Now</button>
+          </label>
+          <label class="gt-row">
+            <input type="checkbox" id="toggle-track" checked /> Show ground track
+          </label>
+          <details class="tle-block">
+            <summary>Raw TLE</summary>
+            <pre id="det-tle"></pre>
+          </details>
+        </div>
+      </div>
+
+      <div id="tab-assistant" class="tab-body hidden" role="tabpanel">
+        <div id="chat-log" class="chat-log" aria-live="polite"></div>
+        <div class="chat-examples" id="chat-examples">
+          <button class="chip chip-q">Where is the ISS right now?</button>
+          <button class="chip chip-q">What is Hubble's inclination?</button>
+          <button class="chip chip-q">Which groups are cached?</button>
+        </div>
+        <form id="chat-form" class="chat-form">
+          <input id="chat-input" type="text" placeholder="Ask about displayed satellites…"
+                 aria-label="Question for the AI assistant" maxlength="1000" autocomplete="off" />
+          <button class="btn btn-primary" type="submit">Send</button>
+        </form>
+        <p class="chat-note">Answers are grounded in OrbitDesk's backend data via tool calls; the assistant refuses to guess missing values.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
