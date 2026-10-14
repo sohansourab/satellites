@@ -1,0 +1,166 @@
+/* OrbitDesk — space-inspired dark theme, readability-first. */
+:root {
+  --bg: #070b16;
+  --bg-panel: #0d1425;
+  --bg-raised: #131c33;
+  --border: #22304f;
+  --text: #dbe4f5;
+  --text-dim: #8b9ab8;
+  --accent: #5eb1ff;
+  --accent-2: #9d7cff;
+  --ok: #4ade80;
+  --warn: #fbbf24;
+  --err: #f87171;
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: radial-gradient(1200px 600px at 80% -10%, #14204055, transparent), var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+}
+
+.hidden { display: none !important; }
+
+/* ---------- top bar ---------- */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 16px; border-bottom: 1px solid var(--border);
+  background: linear-gradient(90deg, #0b1224, #101a35);
+  flex-wrap: wrap;
+}
+.brand { display: flex; align-items: baseline; gap: 10px; }
+.brand h1 { font-size: 1.25rem; margin: 0; letter-spacing: 0.5px; }
+.brand-orbit { color: var(--accent); font-size: 1.4rem; }
+.tagline { color: var(--text-dim); font-size: 0.8rem; }
+.status-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip {
+  font-size: 0.72rem; padding: 3px 10px; border-radius: 999px;
+  background: var(--bg-raised); border: 1px solid var(--border); color: var(--text-dim);
+}
+.chip-ok { color: var(--ok); border-color: #244; }
+.chip-warn { color: var(--warn); border-color: #543; }
+.chip-demo { color: var(--accent-2); border-color: #335; }
+
+/* ---------- layout ---------- */
+.layout {
+  flex: 1; display: grid; gap: 12px; padding: 12px;
+  grid-template-columns: minmax(240px, 320px) minmax(0, 1fr) minmax(280px, 380px);
+  min-height: 0;
+}
+.panel {
+  background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);
+  display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+}
+.panel-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px 6px; }
+.panel-head h2 { margin: 0; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
+.panel-foot { padding: 6px 12px; font-size: 0.72rem; color: var(--text-dim); border-top: 1px solid var(--border); }
+
+/* ---------- list panel ---------- */
+.search-row { padding: 0 12px 8px; }
+input[type="search"], input[type="text"], select, input[type="datetime-local"] {
+  width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--bg-raised); color: var(--text); font-size: 0.85rem;
+}
+input:focus, select:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.group-row { display: flex; align-items: center; gap: 8px; padding: 0 12px 8px; font-size: 0.8rem; color: var(--text-dim); }
+.group-row select { flex: 1; }
+.notice { margin: 0 12px 8px; padding: 8px 10px; font-size: 0.78rem; border-radius: 8px;
+  background: #33270f; color: var(--warn); border: 1px solid #55401a; }
+
+.sat-list { list-style: none; margin: 0; padding: 0 6px 6px; overflow-y: auto; flex: 1; }
+.sat-item {
+  padding: 8px 10px; border-radius: 8px; cursor: pointer; display: flex; gap: 8px;
+  align-items: baseline; justify-content: space-between; border: 1px solid transparent;
+}
+.sat-item:hover { background: var(--bg-raised); }
+.sat-item.selected { background: var(--bg-raised); border-color: var(--accent); }
+.sat-item .name { font-size: 0.85rem; }
+.sat-item .id { font-size: 0.7rem; color: var(--text-dim); white-space: nowrap; }
+
+.state-box { padding: 24px 16px; text-align: center; color: var(--text-dim); font-size: 0.85rem; }
+.state-error { color: var(--err); }
+.spinner {
+  width: 28px; height: 28px; margin: 0 auto 10px; border-radius: 50%;
+  border: 3px solid var(--border); border-top-color: var(--accent); animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.btn {
+  background: var(--bg-raised); color: var(--text); border: 1px solid var(--border);
+  border-radius: 8px; padding: 7px 12px; cursor: pointer; font-size: 0.82rem;
+}
+.btn:hover { border-color: var(--accent); }
+.btn-primary { background: #1b3a63; border-color: var(--accent); }
+.btn-small { padding: 4px 10px; font-size: 0.75rem; }
+.btn-icon { font-size: 1rem; padding: 4px 10px; line-height: 1; }
+.btn:disabled { opacity: 0.5; cursor: wait; }
+
+/* ---------- map ---------- */
+.panel-map { position: relative; }
+#map { flex: 1; min-height: 300px; background: #0a1122; }
+.map-overlay {
+  position: absolute; z-index: 500; left: 12px; bottom: 12px; max-width: 70%;
+  background: #0d1425dd; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px;
+  backdrop-filter: blur(4px);
+}
+.map-caption { display: flex; flex-direction: column; gap: 2px; }
+.map-caption strong { font-size: 0.9rem; color: var(--accent); }
+.map-caption span { font-size: 0.72rem; color: var(--text-dim); }
+.map-time { top: 12px; bottom: auto; right: 12px; left: auto; max-width: none; font-size: 0.72rem; color: var(--text-dim); }
+.sat-marker {
+  width: 14px; height: 14px; border-radius: 50%; background: var(--accent);
+  border: 2px solid #fff8; box-shadow: 0 0 10px var(--accent);
+}
+.sat-marker.selected { background: var(--accent-2); box-shadow: 0 0 14px var(--accent-2); }
+
+/* Leaflet dark tweaks */
+.leaflet-container { background: #0a1122; font: inherit; }
+.leaflet-control-attribution { background: #0d1425cc !important; color: var(--text-dim) !important; font-size: 10px !important; }
+.leaflet-control-attribution a { color: var(--accent) !important; }
+.leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--bg-raised); color: var(--text); }
+
+/* ---------- side panel ---------- */
+.tabs { display: flex; border-bottom: 1px solid var(--border); }
+.tab {
+  flex: 1; padding: 10px; background: none; border: none; color: var(--text-dim);
+  font-size: 0.85rem; cursor: pointer; border-bottom: 2px solid transparent;
+}
+.tab.active { color: var(--text); border-bottom-color: var(--accent); }
+.tab-body { flex: 1; overflow-y: auto; padding: 12px; min-height: 0; display: flex; flex-direction: column; }
+
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; margin: 10px 0; }
+.detail-grid div { border-bottom: 1px dashed var(--border); padding-bottom: 4px; }
+.detail-grid dt { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); }
+.detail-grid dd { margin: 2px 0 0; font-size: 0.82rem; word-break: break-word; }
+#details-body h3 { margin: 4px 0 0; color: var(--accent); font-size: 1.05rem; }
+.pos-time-row { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: var(--text-dim); margin-top: 8px; }
+.pos-time-row input { flex: 1; }
+.gt-row { display: flex; gap: 8px; align-items: center; font-size: 0.8rem; margin-top: 8px; color: var(--text-dim); }
+.tle-block { margin-top: 12px; font-size: 0.78rem; }
+.tle-block pre { background: var(--bg-raised); padding: 8px; border-radius: 8px; overflow-x: auto; font-size: 0.7rem; }
+
+/* ---------- chat ---------- */
+.chat-log { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-bottom: 10px; }
+.msg { max-width: 92%; padding: 8px 12px; border-radius: 10px; font-size: 0.84rem; white-space: pre-wrap; line-height: 1.45; }
+.msg.user { align-self: flex-end; background: #1b3a63; }
+.msg.bot { align-self: flex-start; background: var(--bg-raised); border: 1px solid var(--border); }
+.msg.bot.error { border-color: var(--err); }
+.msg .tools { display: block; margin-top: 6px; font-size: 0.7rem; color: var(--text-dim); }
+.msg.pending { color: var(--text-dim); font-style: italic; }
+.chat-examples { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 0; }
+.chip-q { cursor: pointer; }
+.chip-q:hover { color: var(--text); border-color: var(--accent); }
+.chat-form { display: flex; gap: 8px; }
+.chat-note { font-size: 0.68rem; color: var(--text-dim); margin: 6px 0 0; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1000px) {
+  .layout { grid-template-columns: 1fr; grid-auto-rows: minmax(300px, auto); }
+  .panel-map { order: -1; min-height: 340px; }
+}
