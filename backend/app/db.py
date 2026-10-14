@@ -20,14 +20,15 @@ _lock = threading.Lock()
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS satellites (
-    norad_id   TEXT PRIMARY KEY,
+    norad_id   TEXT NOT NULL,
     name       TEXT NOT NULL,
     object_id  TEXT,
     group_name TEXT NOT NULL,
     tle_line1  TEXT NOT NULL,
     tle_line2  TEXT NOT NULL,
     source     TEXT NOT NULL DEFAULT 'celestrak',
-    fetched_at TEXT NOT NULL
+    fetched_at TEXT NOT NULL,
+    PRIMARY KEY (norad_id, group_name)
 );
 CREATE TABLE IF NOT EXISTS app_state (
     key   TEXT PRIMARY KEY,
@@ -114,7 +115,10 @@ def list_satellites(group: Optional[str] = None, search: Optional[str] = None) -
 
 def get_satellite(norad_id: str) -> Optional[dict[str, Any]]:
     with _lock, _connect() as conn:
-        row = conn.execute("SELECT * FROM satellites WHERE norad_id = ?", (norad_id,)).fetchone()
+        row = conn.execute(
+            "SELECT * FROM satellites WHERE norad_id = ? ORDER BY fetched_at DESC LIMIT 1",
+            (norad_id,),
+        ).fetchone()
         return dict(row) if row else None
 
 

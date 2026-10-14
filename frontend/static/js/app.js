@@ -51,8 +51,8 @@ function show(el, visible) { el.classList.toggle("hidden", !visible); }
 // ---------------- map ----------------
 
 const map = L.map("map", { worldCopyJump: true, zoomControl: true }).setView([20, 0], 1);
-L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+  attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics',
   maxZoom: 19,
 }).addTo(map);
 
@@ -125,6 +125,9 @@ async function loadSatellites() {
     state.satellites = data.items;
     updateChips(data.data_source, data.last_updated);
     renderList();
+
+    // Re-render group dropdown now that the cache is populated.
+    await loadGroups();
   } catch (err) {
     setListState({ error: err.message });
   } finally {
